@@ -7,10 +7,7 @@
     <title>Daily Digest (Nov 21, 2026)</title>
     <id>urn:daily-digest:2026-11-21</id>
     <updated>2026-11-21T06:00:00Z</updated>
-    <author>
-      <name>Daily News Bot</name>
-    </author>
+    <author><name>Daily News Bot</name></author>
     <link rel="http://opds-spec.org" href="https://residentevil789.github.io/daily-news/Daily-Digest.epub" type="application/epub+zip"/>
-    <link rel="http://opds-spec.org" href="/daily-news/Daily-Digest.epub" type="application/epub+zip"/>
   </entry>
 </feed>
