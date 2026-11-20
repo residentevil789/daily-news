@@ -1,10 +1,15 @@
 import datetime, os, html
+import requests
 import feedparser
 import trafilatura
 from ebooklib import epub
 
 GITHUB_USER = "residentevil789"
 REPO_NAME = "daily-news"
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+}
 
 FEEDS = [
     # National Breaking & Politics
@@ -53,14 +58,25 @@ book.add_author("Daily News Bot")
 
 chapters = []
 for idx, (name, url) in enumerate(FEEDS):
-    parsed = feedparser.parse(url)
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        parsed = feedparser.parse(resp.content)
+    except Exception:
+        parsed = feedparser.parse("")
+
     items_html = f"<h1>{html.escape(name)}</h1>"
     for entry in parsed.entries[:4]:
         title = html.escape(entry.get("title", "No Title"))
         link = entry.get("link", "")
         
-        downloaded = trafilatura.fetch_url(link) if link else None
-        full_text = trafilatura.extract(downloaded, include_comments=False) if downloaded else None
+        full_text = None
+        if link:
+            try:
+                art_resp = requests.get(link, headers=HEADERS, timeout=15)
+                if art_resp.status_code == 200:
+                    full_text = trafilatura.extract(art_resp.text, include_comments=False)
+            except Exception:
+                pass
         
         if full_text:
             paragraphs = "".join(f"<p>{html.escape(p)}</p>" for p in full_text.split("\n") if p.strip())
@@ -94,11 +110,8 @@ opds = f"""<?xml version="1.0" encoding="UTF-8"?>
     <title>Daily Digest ({nice_date})</title>
     <id>urn:daily-digest:{today_str}</id>
     <updated>{today_str}T06:00:00Z</updated>
-    <author>
-      <name>Daily News Bot</name>
-    </author>
+    <author><name>Daily News Bot</name></author>
     <link rel="http://opds-spec.org" href="{base_url}/{epub_filename}" type="application/epub+zip"/>
-    <link rel="http://opds-spec.org" href="/{REPO_NAME}/{epub_filename}" type="application/epub+zip"/>
   </entry>
 </feed>"""
 
