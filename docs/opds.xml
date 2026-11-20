@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://w3.org">
+  <title>My Daily Newspaper</title>
+  <updated>2026-11-20T06:00:00+08:00</updated>
+  <entry>
+    <title>Daily Digest (Nov 20, 2026)</title>
+    <id>urn:daily-digest:2026-11-20</id>
+    <updated>2026-11-20T06:00:00+08:00</updated>
+    <link rel="http://opds-spec.org" href="Daily-Digest.epub" type="application/epub+zip"/>
+  </entry>
+</feed>
