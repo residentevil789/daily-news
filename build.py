@@ -94,14 +94,13 @@ opds = f"""<?xml version="1.0" encoding="UTF-8"?>
     <title>Daily Digest ({nice_date})</title>
     <id>urn:daily-digest:{today_str}</id>
     <updated>{today_str}T06:00:00Z</updated>
-    <author><name>Daily News Bot</name></author>
-    <link type="application/epub+zip" rel="http://opds-spec.org" href="{base_url}/{epub_filename}"/>
+    <author>
+      <name>Daily News Bot</name>
+    </author>
+    <link rel="http://opds-spec.org" href="{base_url}/{epub_filename}" type="application/epub+zip"/>
+    <link rel="http://opds-spec.org" href="/{REPO_NAME}/{epub_filename}" type="application/epub+zip"/>
   </entry>
 </feed>"""
 
 with open("docs/opds.xml", "w", encoding="utf-8") as f:
-    f.write(opds)
-
-os.makedirs("docs/opds", exist_ok=True)
-with open("docs/opds/index.xml", "w", encoding="utf-8") as f:
     f.write(opds)
