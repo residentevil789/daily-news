@@ -3,6 +3,9 @@ import feedparser
 import trafilatura
 from ebooklib import epub
 
+GITHUB_USER = "residentevil789"
+REPO_NAME = "daily-news"
+
 FEEDS = [
     # National Breaking & Politics
     ("Philippine Daily Inquirer", "https://inquirer.net"),
@@ -80,15 +83,21 @@ os.makedirs("docs", exist_ok=True)
 epub_filename = "Daily-Digest.epub"
 epub.write_epub(f"docs/{epub_filename}", book)
 
+base_url = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
+
 opds = f"""<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://w3.org">
+<feed xmlns="http://w3.org" xmlns:dc="http://purl.org" xmlns:opds="http://opds-spec.org">
+  <id>urn:daily-newspaper</id>
   <title>My Daily Newspaper</title>
-  <updated>{today_str}T06:00:00+08:00</updated>
+  <updated>{today_str}T06:00:00Z</updated>
+  <link rel="self" href="{base_url}/opds.xml" type="application/atom+xml;profile=opds-catalog;kind=acquisition"/>
   <entry>
     <title>Daily Digest ({nice_date})</title>
     <id>urn:daily-digest:{today_str}</id>
-    <updated>{today_str}T06:00:00+08:00</updated>
-    <link rel="http://opds-spec.org" href="{epub_filename}" type="application/epub+zip"/>
+    <updated>{today_str}T06:00:00Z</updated>
+    <author><name>Daily News Bot</name></author>
+    <summary>Combined Philippine and World News for {nice_date}</summary>
+    <link rel="http://opds-spec.org" href="{base_url}/{epub_filename}" type="application/epub+zip"/>
   </entry>
 </feed>"""
 
