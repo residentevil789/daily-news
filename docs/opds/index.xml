@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://w3.org">
+  <id>urn:daily-newspaper</id>
+  <title>My Daily Newspaper</title>
+  <updated>2026-11-21T06:00:00Z</updated>
+  <entry>
+    <title>Daily Digest (Nov 21, 2026)</title>
+    <id>urn:daily-digest:2026-11-21</id>
+    <updated>2026-11-21T06:00:00Z</updated>
+    <author><name>Daily News Bot</name></author>
+    <link type="application/epub+zip" rel="http://opds-spec.org" href="https://residentevil789.github.io/daily-news/Daily-Digest.epub"/>
+  </entry>
+</feed>
