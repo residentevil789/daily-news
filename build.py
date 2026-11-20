@@ -1,0 +1,96 @@
+import datetime, os, html
+import feedparser
+import trafilatura
+from ebooklib import epub
+
+FEEDS = [
+    # National Breaking & Politics
+    ("Philippine Daily Inquirer", "https://inquirer.net"),
+    ("Rappler", "https://rappler.com"),
+    ("Philstar Headlines", "https://philstar.com"),
+    ("GMA News", "https://gmanetwork.com"),
+    
+    # Davao & Mindanao Local
+    ("MindaNews", "https://mindanews.com"),
+    ("Edge Davao", "https://edgedavao.net"),
+    ("SunStar Davao", "https://sunstar.com.ph"),
+    
+    # Business & PH Economy
+    ("BusinessWorld", "https://bworldonline.com"),
+    ("Inquirer Business", "https://inquirer.net"),
+    ("Philstar Business", "https://philstar.com"),
+    
+    # Tech & Gadgets
+    ("YugaTech", "https://yugatech.com"),
+    ("Unbox PH", "https://unbox.ph"),
+    ("The Verge", "https://theverge.com"),
+    
+    # Sports
+    ("Spin.ph", "https://spin.ph"),
+    ("Tiebreaker Times", "https://tiebreakertimes.com.ph"),
+    
+    # Lifestyle & Culture
+    ("Pepper.ph", "https://pepper.ph"),
+    ("Inquirer Lifestyle", "https://inquirer.net"),
+    
+    # World Headlines
+    ("BBC World", "http://bbci.co.uk"),
+    ("Al Jazeera", "https://aljazeera.com"),
+]
+
+now_mnl = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+today_str = now_mnl.strftime("%Y-%m-%d")
+nice_date = now_mnl.strftime("%b %d, %Y")
+
+book = epub.EpubBook()
+book.set_identifier(f"daily-digest-{today_str}")
+book.set_title(f"Daily Digest - {nice_date}")
+book.set_language("en")
+book.add_author("Daily News Bot")
+
+chapters = []
+for idx, (name, url) in enumerate(FEEDS):
+    parsed = feedparser.parse(url)
+    items_html = f"<h1>{html.escape(name)}</h1>"
+    for entry in parsed.entries[:4]:
+        title = html.escape(entry.get("title", "No Title"))
+        link = entry.get("link", "")
+        
+        downloaded = trafilatura.fetch_url(link) if link else None
+        full_text = trafilatura.extract(downloaded, include_comments=False) if downloaded else None
+        
+        if full_text:
+            paragraphs = "".join(f"<p>{html.escape(p)}</p>" for p in full_text.split("\n") if p.strip())
+        else:
+            paragraphs = f"<div>{entry.get('summary', 'No content available.')}</div>"
+            
+        items_html += f"<h2>{title}</h2>{paragraphs}<hr/>"
+    
+    c = epub.EpubHtml(title=name, file_name=f"section_{idx}.xhtml", lang="en")
+    c.content = f"<html><body>{items_html}</body></html>"
+    book.add_item(c)
+    chapters.append(c)
+
+book.toc = tuple(chapters)
+book.add_item(epub.EpubNcx())
+book.add_item(epub.EpubNav())
+book.spine = ["nav"] + chapters
+
+os.makedirs("docs", exist_ok=True)
+epub_filename = "Daily-Digest.epub"
+epub.write_epub(f"docs/{epub_filename}", book)
+
+opds = f"""<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://w3.org">
+  <title>My Daily Newspaper</title>
+  <updated>{today_str}T06:00:00+08:00</updated>
+  <entry>
+    <title>Daily Digest ({nice_date})</title>
+    <id>urn:daily-digest:{today_str}</id>
+    <updated>{today_str}T06:00:00+08:00</updated>
+    <link rel="http://opds-spec.org" href="{epub_filename}" type="application/epub+zip"/>
+  </entry>
+</feed>"""
+
+with open("docs/opds.xml", "w", encoding="utf-8") as f:
+    f.write(opds)
