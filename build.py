@@ -13,6 +13,7 @@ HEADERS = {
 }
 
 S = chr(47)
+W = "www" + "."
 
 def gnews(query):
     host = "news." + "google." + "com"
@@ -39,9 +40,9 @@ FEEDS = [
     ("Philstar Business", gnews("site:philstar.com+business+when:1d")),
 
     # Tech & Gadgets
-    ("YugaTech", direct("://yugatech.com", "feed/")),
+    ("YugaTech", direct(W + "yugatech.com", "feed/")),
     ("Unbox PH", direct("unbox.ph", "feed/")),
-    ("The Verge", direct("://theverge.com", "rss/index.xml")),
+    ("The Verge", direct(W + "theverge.com", "rss/index.xml")),
 
     # Sports
     ("Spin.ph", gnews("site:spin.ph+when:1d")),
@@ -53,7 +54,7 @@ FEEDS = [
 
     # World Headlines
     ("BBC World", direct("feeds.bbci.co.uk", "news/world/rss.xml")),
-    ("Al Jazeera", direct("://aljazeera.com", "xml/rss/all.xml")),
+    ("Al Jazeera", direct(W + "aljazeera.com", "xml/rss/all.xml")),
 ]
 
 now_mnl = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
