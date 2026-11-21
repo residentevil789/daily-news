@@ -1,0 +1,20 @@
+Run time (MNL): 2026-11-21 09:26:42
+Philippine Daily Inquirer: HTTP 200, entries=0
+Rappler: HTTP 200, entries=0
+Philstar Headlines: HTTP 200, entries=0
+GMA News: HTTP 200, entries=0
+MindaNews: HTTP 403, entries=0
+Edge Davao: HTTP 200, entries=0
+SunStar Davao: HTTP 200, entries=0
+BusinessWorld: HTTP 200, entries=0
+Inquirer Business: HTTP 200, entries=0
+Philstar Business: HTTP 200, entries=0
+YugaTech: HTTP 200, entries=0
+Unbox PH: HTTP 200, entries=0
+The Verge: HTTP 200, entries=0
+Spin.ph: HTTP 403, entries=0
+Tiebreaker Times: HTTP 200, entries=0
+Pepper.ph: HTTP 200, entries=0
+Inquirer Lifestyle: HTTP 200, entries=0
+BBC World: ERROR HTTPSConnectionPool(host='bbci.co.uk', port=443): Max retries exceeded with url: / (Caused by NewConnectionError("HTTPSConnection(host='bbci.co.uk', port=443): Failed to establish a new connection: [Errno 111] Connection refused"))
+Al Jazeera: HTTP 200, entries=0
