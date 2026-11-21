@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://w3.org">
+<feed xmlns="http://www.w3.org/2005/Atom">
   <id>urn:daily-newspaper</id>
   <title>My Daily Newspaper</title>
   <updated>2026-11-21T06:00:00Z</updated>
@@ -8,6 +8,6 @@
     <id>urn:daily-digest:2026-11-21</id>
     <updated>2026-11-21T06:00:00Z</updated>
     <author><name>Daily News Bot</name></author>
-    <link rel="http://opds-spec.org" href="https://residentevil789.github.io/daily-news/Daily-Digest.epub" type="application/epub+zip"/>
+    <link rel="http://opds-spec.org/acquisition" href="https://residentevil789.github.io/daily-news/Daily-Digest.epub" type="application/epub+zip"/>
   </entry>
 </feed>
