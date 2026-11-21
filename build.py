@@ -8,41 +8,29 @@ GITHUB_USER = "residentevil789"
 REPO_NAME = "daily-news"
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://google.com)",
-    "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9"
 }
 
 FEEDS = [
-    # National Breaking & Politics
-    ("Philippine Daily Inquirer", "https://google.com"),
-    ("Rappler", "https://google.com"),
-    ("Philstar Headlines", "https://google.com"),
+    ("Philippine Daily Inquirer", "https://inquirer.net"),
+    ("Rappler", "https://rappler.com"),
+    ("Philstar Headlines", "https://philstar.com"),
     ("GMA News", "https://gmanetwork.com"),
-
-    # Davao & Mindanao Local
     ("MindaNews", "https://mindanews.com"),
     ("Edge Davao", "https://edgedavao.net"),
-    ("SunStar Davao", "https://google.com"),
-
-    # Business & PH Economy
-    ("BusinessWorld", "https://google.com"),
-    ("Inquirer Business", "https://google.com"),
-    ("Philstar Business", "https://google.com"),
-
-    # Tech & Gadgets
+    ("SunStar Davao", "https://sunstar.com.ph"),
+    ("BusinessWorld", "https://bworldonline.com"),
+    ("Inquirer Business", "https://inquirer.net"),
+    ("Philstar Business", "https://philstar.com"),
     ("YugaTech", "https://yugatech.com"),
     ("Unbox PH", "https://unbox.ph"),
     ("The Verge", "https://theverge.com"),
-
-    # Sports
-    ("Spin.ph", "https://google.com"),
+    ("Spin.ph", "https://spin.ph"),
     ("Tiebreaker Times", "https://tiebreakertimes.com.ph"),
-
-    # Lifestyle & Culture
     ("Pepper.ph", "https://pepper.ph"),
-    ("Inquirer Lifestyle", "https://google.com"),
-
-    # World Headlines
+    ("Inquirer Lifestyle", "https://inquirer.net"),
     ("BBC World", "https://bbci.co.uk"),
     ("Al Jazeera", "https://aljazeera.com"),
 ]
@@ -57,16 +45,18 @@ book.set_title(f"Daily Digest - {nice_date}")
 book.set_language("en")
 book.add_author("Daily News Bot")
 
+debug_lines = [f"Run time (MNL): {now_mnl.strftime('%Y-%m-%d %H:%M:%S')}"]
 chapters = []
+
 for idx, (name, url) in enumerate(FEEDS):
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
         parsed = feedparser.parse(resp.content)
+        debug_lines.append(f"{name}: HTTP {resp.status_code}, entries={len(parsed.entries)}")
     except Exception as e:
-        print(f"Failed {name}: {e}")
+        debug_lines.append(f"{name}: ERROR {e}")
         parsed = feedparser.parse("")
 
-    print(f"{name}: {len(parsed.entries)} entries")
     if not parsed.entries:
         continue
 
@@ -76,7 +66,7 @@ for idx, (name, url) in enumerate(FEEDS):
         link = entry.get("link", "")
 
         full_text = None
-        if link and "://google.com" not in link:
+        if link:
             try:
                 art_resp = requests.get(link, headers=HEADERS, timeout=12)
                 if art_resp.status_code == 200:
@@ -111,6 +101,9 @@ book.spine = ["nav"] + chapters
 os.makedirs("docs", exist_ok=True)
 epub_filename = "Daily-Digest.epub"
 epub.write_epub(f"docs/{epub_filename}", book)
+
+with open("docs/debug.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(debug_lines))
 
 base_url = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
 
