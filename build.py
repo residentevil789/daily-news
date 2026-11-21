@@ -9,30 +9,32 @@ REPO_NAME = "daily-news"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9"
+    "Accept": "application/rss+xml, application/xml, text/xml, */*"
 }
 
+def gnews(query):
+    return f"https://google.com{query}&hl=en-PH&gl=PH&ceid=PH:en"
+
 FEEDS = [
-    ("Philippine Daily Inquirer", "https://inquirer.net"),
-    ("Rappler", "https://rappler.com"),
-    ("Philstar Headlines", "https://philstar.com"),
-    ("GMA News", "https://gmanetwork.com"),
-    ("MindaNews", "https://mindanews.com"),
-    ("Edge Davao", "https://edgedavao.net"),
-    ("SunStar Davao", "https://sunstar.com.ph"),
-    ("BusinessWorld", "https://bworldonline.com"),
-    ("Inquirer Business", "https://inquirer.net"),
-    ("Philstar Business", "https://philstar.com"),
-    ("YugaTech", "https://yugatech.com"),
-    ("Unbox PH", "https://unbox.ph"),
-    ("The Verge", "https://theverge.com"),
-    ("Spin.ph", "https://spin.ph"),
-    ("Tiebreaker Times", "https://tiebreakertimes.com.ph"),
-    ("Pepper.ph", "https://pepper.ph"),
-    ("Inquirer Lifestyle", "https://inquirer.net"),
-    ("BBC World", "https://bbci.co.uk"),
-    ("Al Jazeera", "https://aljazeera.com"),
+    ("Philippine Daily Inquirer", gnews("site:inquirer.net+when:1d")),
+    ("Rappler", gnews("site:rappler.com+when:1d")),
+    ("Philstar Headlines", gnews("site:philstar.com+when:1d")),
+    ("GMA News", "https://gmanetwork.com" + "/gno/rss/news/feed.xml"),
+    ("MindaNews", gnews("site:mindanews.com+when:2d")),
+    ("Edge Davao", "https://edgedavao.net" + "/feed/"),
+    ("SunStar Davao", gnews("site:sunstar.com.ph+davao+when:2d")),
+    ("BusinessWorld", gnews("site:bworldonline.com+when:1d")),
+    ("Inquirer Business", gnews("site:business.inquirer.net+when:1d")),
+    ("Philstar Business", gnews("site:philstar.com+business+when:1d")),
+    ("YugaTech", "https://yugatech.com" + "/feed/"),
+    ("Unbox PH", "https://unbox.ph" + "/feed/"),
+    ("The Verge", "https://theverge.com" + "/rss/index.xml"),
+    ("Spin.ph", gnews("site:spin.ph+when:1d")),
+    ("Tiebreaker Times", "https://tiebreakertimes.com.ph" + "/feed/"),
+    ("Pepper.ph", "https://pepper.ph" + "/feed/"),
+    ("Inquirer Lifestyle", gnews("site:lifestyle.inquirer.net+when:2d")),
+    ("BBC World", "https://bbci.co.uk" + "/news/world/rss.xml"),
+    ("Al Jazeera", "https://aljazeera.com" + "/xml/rss/all.xml"),
 ]
 
 now_mnl = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
@@ -66,7 +68,7 @@ for idx, (name, url) in enumerate(FEEDS):
         link = entry.get("link", "")
 
         full_text = None
-        if link:
+        if link and "://google.com" not in link:
             try:
                 art_resp = requests.get(link, headers=HEADERS, timeout=12)
                 if art_resp.status_code == 200:
