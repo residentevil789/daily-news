@@ -1,4 +1,4 @@
-Run time (MNL): 2026-11-21 09:43:00
+Run time (MNL): 2026-11-21 09:46:55
 Philippine Daily Inquirer: HTTP 200, entries=100
 Rappler: HTTP 200, entries=100
 Philstar Headlines: HTTP 200, entries=100
@@ -9,12 +9,12 @@ SunStar Davao: HTTP 200, entries=100
 BusinessWorld: HTTP 200, entries=32
 Inquirer Business: HTTP 200, entries=21
 Philstar Business: HTTP 200, entries=100
-YugaTech: ERROR Invalid URL 'https://://yugatech.com/feed/': No host supplied
+YugaTech: HTTP 200, entries=10
 Unbox PH: HTTP 200, entries=10
-The Verge: ERROR Invalid URL 'https://://theverge.com/rss/index.xml': No host supplied
-Spin.ph: HTTP 200, entries=26
+The Verge: HTTP 200, entries=10
+Spin.ph: HTTP 200, entries=25
 Tiebreaker Times: HTTP 200, entries=10
 Pepper.ph: HTTP 200, entries=1
 Inquirer Lifestyle: HTTP 200, entries=18
 BBC World: HTTP 200, entries=25
-Al Jazeera: ERROR Invalid URL 'https://://aljazeera.com/xml/rss/all.xml': No host supplied
+Al Jazeera: HTTP 200, entries=25
