@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>urn:daily-newspaper</id>
   <title>My Daily Newspaper</title>
-  <updated>2026-11-21T06:00:00Z</updated>
+  <updated>2026-11-22T06:00:00Z</updated>
   <entry>
-    <title>Daily Digest (Nov 21, 2026)</title>
-    <id>urn:daily-digest:2026-11-21</id>
-    <updated>2026-11-21T06:00:00Z</updated>
+    <title>Daily Digest (Nov 22, 2026)</title>
+    <id>urn:daily-digest:2026-11-22</id>
+    <updated>2026-11-22T06:00:00Z</updated>
     <author><name>Daily News Bot</name></author>
     <link rel="http://opds-spec.org/acquisition" href="https://residentevil789.github.io/daily-news/Daily-Digest.epub" type="application/epub+zip"/>
   </entry>
