@@ -26,7 +26,7 @@ def make_brief(text, title="", max_sentences=4, max_chars=650):
     sentences = re.split(r'(?<=[.!?])\s+', clean)
     brief = " ".join(sentences[:max_sentences])
     if len(brief) > max_chars:
-        brief = brief[:max_chars].rsplit(" ", 1) + "..."
+        brief = brief[:max_chars].rsplit(" ", 1)[0] + "..."
     return brief
 
 def extract_recipe_html(page_html):
@@ -79,35 +79,22 @@ def get_pepper_recipes():
 SPAM_WORDS = ("casino", "gambling", "betting", "slot", "sabong", "poker", "roulette", "jackpot", "pragmatic play", "jili")
 
 FEEDS = [
-    # National Breaking & Politics
     ("Philippine Daily Inquirer", direct("newsinfo.inquirer.net", "feed")),
     ("Rappler", direct(W + "rappler.com", "feed/")),
     ("Philstar Headlines", direct(W + "philstar.com", "rss/headlines")),
     ("GMA News", direct("://gmanetwork.com", "gno/rss/news/nation/feed.xml")),
-
-    # Davao & Mindanao Local
     ("MindaNews", direct("mindanews.com", "feed/")),
     ("Edge Davao", direct("edgedavao.net", "feed/")),
     ("SunStar Davao", direct(W + "sunstar.com.ph", "api/v1/collections/davao.rss")),
-
-    # Business & PH Economy
     ("BusinessWorld", direct(W + "bworldonline.com", "feed/")),
     ("Inquirer Business", direct("business.inquirer.net", "feed")),
     ("Philstar Business", direct(W + "philstar.com", "rss/business")),
-
-    # Tech & Gadgets
     ("YugaTech", direct(W + "yugatech.com", "feed/")),
     ("Unbox PH", direct("unbox.ph", "feed/")),
     ("The Verge", direct(W + "theverge.com", "rss/index.xml")),
-
-    # Sports
     ("Spin.ph", direct(W + "spin.ph", "feed")),
     ("Tiebreaker Times", direct("tiebreakertimes.com.ph", "feed/")),
-
-    # Lifestyle & Culture
     ("Inquirer Lifestyle", direct("lifestyle.inquirer.net", "feed")),
-
-    # World Headlines
     ("BBC World", direct("feeds.bbci.co.uk", "news/world/rss.xml")),
     ("Al Jazeera", direct(W + "aljazeera.com", "xml/rss/all.xml")),
 ]
@@ -148,10 +135,9 @@ for idx, (name, url) in enumerate(FEEDS):
         title = html.escape(raw_title)
         link = entry.get("link", "")
 
-        # 1. Try RSS embedded content/summary first (instant & never blocked)
         raw_feed_html = ""
         if entry.get("content"):
-        raw_feed_html = entry["content"][0].get("value", "")
+            raw_feed_html = entry["content"][0].get("value", "")
         if not raw_feed_html:
             raw_feed_html = entry.get("summary", entry.get("description", ""))
 
@@ -159,7 +145,6 @@ for idx, (name, url) in enumerate(FEEDS):
         if not clean_text and raw_feed_html:
             clean_text = re.sub(r'<[^>]+>', ' ', raw_feed_html)
 
-        # 2. If RSS summary was too short (<120 chars), scrape the article page directly
         if len(" ".join((clean_text or "").split())) < 120 and link:
             try:
                 art_resp = requests.get(link, headers=HEADERS, timeout=10)
@@ -183,7 +168,6 @@ for idx, (name, url) in enumerate(FEEDS):
         book.add_item(c)
         chapters.append(c)
 
-# Add Pepper.ph recipes section
 pepper_html = get_pepper_recipes()
 if pepper_html:
     c = epub.EpubHtml(title="Pepper.ph", file_name="section_pepper.xhtml", lang="en")
