@@ -1,15 +1,17 @@
-import datetime, os, html
+import datetime, os, html, re
 import requests
 import feedparser
 import trafilatura
 from ebooklib import epub
+from googlenewsdecoder import new_decoderv1
 
 GITHUB_USER = "residentevil789"
 REPO_NAME = "daily-news"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-    "Accept": "application/rss+xml, application/xml, text/xml, */*"
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9"
 }
 
 S = chr(47)
@@ -21,6 +23,24 @@ def gnews(query):
 
 def direct(host, path):
     return f"https:{S}{S}{host}{S}{path}"
+
+def resolve_url(link):
+    if "google.com" in link:
+        try:
+            decoded = new_decoderv1(link, interval=1)
+            if decoded.get("status") and decoded.get("decoded_url"):
+                return decoded["decoded_url"]
+        except Exception:
+            pass
+    return link
+
+def make_brief(text, max_sentences=3, max_chars=450):
+    clean = " ".join(text.split())
+    sentences = re.split(r'(?<=[.!?])\s+', clean)
+    brief = " ".join(sentences[:max_sentences])
+    if len(brief) > max_chars:
+        brief = brief[:max_chars].rsplit(" ", 1)[0] + "..."
+    return brief
 
 FEEDS = [
     # National Breaking & Politics
@@ -49,7 +69,7 @@ FEEDS = [
     ("Tiebreaker Times", direct("tiebreakertimes.com.ph", "feed/")),
 
     # Lifestyle & Culture
-    ("Pepper.ph", gnews("site:pepper.ph+when:7d")),
+    ("Pepper.ph", gnews("site:pepper.ph+when:14d")),
     ("Inquirer Lifestyle", gnews("site:lifestyle.inquirer.net+when:2d")),
 
     # World Headlines
@@ -67,16 +87,13 @@ book.set_title(f"Daily Digest - {nice_date}")
 book.set_language("en")
 book.add_author("Daily News Bot")
 
-debug_lines = [f"Run time (MNL): {now_mnl.strftime('%Y-%m-%d %H:%M:%S')}"]
 chapters = []
 
 for idx, (name, url) in enumerate(FEEDS):
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
         parsed = feedparser.parse(resp.content)
-        debug_lines.append(f"{name}: HTTP {resp.status_code}, entries={len(parsed.entries)}")
-    except Exception as e:
-        debug_lines.append(f"{name}: ERROR {e}")
+    except Exception:
         parsed = feedparser.parse("")
 
     if not parsed.entries:
@@ -85,24 +102,30 @@ for idx, (name, url) in enumerate(FEEDS):
     items_html = f"<h1>{html.escape(name)}</h1>"
     for entry in parsed.entries[:4]:
         title = html.escape(entry.get("title", "No Title"))
-        link = entry.get("link", "")
+        raw_link = entry.get("link", "")
+        real_link = resolve_url(raw_link) if raw_link else ""
 
         full_text = None
-        if link and "google.com" not in link:
+        if real_link and "google.com" not in real_link:
             try:
-                art_resp = requests.get(link, headers=HEADERS, timeout=12)
+                art_resp = requests.get(real_link, headers=HEADERS, timeout=10)
                 if art_resp.status_code == 200:
                     full_text = trafilatura.extract(art_resp.text, include_comments=False)
             except Exception:
                 pass
 
-        if full_text:
-            paragraphs = "".join(f"<p>{html.escape(p)}</p>" for p in full_text.split("\n") if p.strip())
-        else:
-            summary = entry.get("summary", entry.get("description", "No content available."))
-            paragraphs = f"<div>{summary}</div>"
+        if not full_text and entry.get("content"):
+            raw_content = entry["content"][0].get("value", "")
+            full_text = trafilatura.extract(raw_content, include_comments=False)
 
-        items_html += f"<h2>{title}</h2>{paragraphs}<hr/>"
+        if full_text:
+            brief_text = html.escape(make_brief(full_text))
+            paragraphs = f"<p>{brief_text}</p>"
+        else:
+            raw_summary = trafilatura.extract(entry.get("summary", "")) or "Summary unavailable."
+            paragraphs = f"<p>{html.escape(make_brief(raw_summary))}</p>"
+
+        items_html += f"<h3>{title}</h3>{paragraphs}<hr/>"
 
     c = epub.EpubHtml(title=name, file_name=f"section_{idx}.xhtml", lang="en")
     c.content = f"<html><body>{items_html}</body></html>"
@@ -123,9 +146,6 @@ book.spine = ["nav"] + chapters
 os.makedirs("docs", exist_ok=True)
 epub_filename = "Daily-Digest.epub"
 epub.write_epub(f"docs/{epub_filename}", book)
-
-with open("docs/debug.txt", "w", encoding="utf-8") as f:
-    f.write("\n".join(debug_lines))
 
 base_url = f"https:{S}{S}{GITHUB_USER}.github.io{S}{REPO_NAME}"
 
