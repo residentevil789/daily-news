@@ -12,29 +12,48 @@ HEADERS = {
     "Accept": "application/rss+xml, application/xml, text/xml, */*"
 }
 
+S = chr(47)
+
 def gnews(query):
-    return f"https://google.com{query}&hl=en-PH&gl=PH&ceid=PH:en"
+    host = "news." + "google." + "com"
+    return f"https:{S}{S}{host}{S}rss{S}search?q={query}&hl=en-PH&gl=PH&ceid=PH:en"
+
+def direct(host, path):
+    return f"https:{S}{S}{host}{S}{path}"
 
 FEEDS = [
+    # National Breaking & Politics
     ("Philippine Daily Inquirer", gnews("site:inquirer.net+when:1d")),
     ("Rappler", gnews("site:rappler.com+when:1d")),
     ("Philstar Headlines", gnews("site:philstar.com+when:1d")),
-    ("GMA News", "https://gmanetwork.com" + "/gno/rss/news/feed.xml"),
+    ("GMA News", gnews("site:gmanetwork.com+news+when:1d")),
+
+    # Davao & Mindanao Local
     ("MindaNews", gnews("site:mindanews.com+when:2d")),
-    ("Edge Davao", "https://edgedavao.net" + "/feed/"),
+    ("Edge Davao", direct("edgedavao.net", "feed/")),
     ("SunStar Davao", gnews("site:sunstar.com.ph+davao+when:2d")),
+
+    # Business & PH Economy
     ("BusinessWorld", gnews("site:bworldonline.com+when:1d")),
     ("Inquirer Business", gnews("site:business.inquirer.net+when:1d")),
     ("Philstar Business", gnews("site:philstar.com+business+when:1d")),
-    ("YugaTech", "https://yugatech.com" + "/feed/"),
-    ("Unbox PH", "https://unbox.ph" + "/feed/"),
-    ("The Verge", "https://theverge.com" + "/rss/index.xml"),
+
+    # Tech & Gadgets
+    ("YugaTech", direct("://yugatech.com", "feed/")),
+    ("Unbox PH", direct("unbox.ph", "feed/")),
+    ("The Verge", direct("://theverge.com", "rss/index.xml")),
+
+    # Sports
     ("Spin.ph", gnews("site:spin.ph+when:1d")),
-    ("Tiebreaker Times", "https://tiebreakertimes.com.ph" + "/feed/"),
-    ("Pepper.ph", "https://pepper.ph" + "/feed/"),
+    ("Tiebreaker Times", direct("tiebreakertimes.com.ph", "feed/")),
+
+    # Lifestyle & Culture
+    ("Pepper.ph", gnews("site:pepper.ph+when:7d")),
     ("Inquirer Lifestyle", gnews("site:lifestyle.inquirer.net+when:2d")),
-    ("BBC World", "https://bbci.co.uk" + "/news/world/rss.xml"),
-    ("Al Jazeera", "https://aljazeera.com" + "/xml/rss/all.xml"),
+
+    # World Headlines
+    ("BBC World", direct("feeds.bbci.co.uk", "news/world/rss.xml")),
+    ("Al Jazeera", direct("://aljazeera.com", "xml/rss/all.xml")),
 ]
 
 now_mnl = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
@@ -68,7 +87,7 @@ for idx, (name, url) in enumerate(FEEDS):
         link = entry.get("link", "")
 
         full_text = None
-        if link and "://google.com" not in link:
+        if link and "google.com" not in link:
             try:
                 art_resp = requests.get(link, headers=HEADERS, timeout=12)
                 if art_resp.status_code == 200:
@@ -107,10 +126,10 @@ epub.write_epub(f"docs/{epub_filename}", book)
 with open("docs/debug.txt", "w", encoding="utf-8") as f:
     f.write("\n".join(debug_lines))
 
-base_url = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
+base_url = f"https:{S}{S}{GITHUB_USER}.github.io{S}{REPO_NAME}"
 
 opds = f"""<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://w3.org">
+<feed xmlns="http:{S}{S}www.w3.org{S}2005{S}Atom">
   <id>urn:daily-newspaper</id>
   <title>My Daily Newspaper</title>
   <updated>{today_str}T06:00:00Z</updated>
@@ -119,7 +138,7 @@ opds = f"""<?xml version="1.0" encoding="UTF-8"?>
     <id>urn:daily-digest:{today_str}</id>
     <updated>{today_str}T06:00:00Z</updated>
     <author><name>Daily News Bot</name></author>
-    <link rel="http://opds-spec.org" href="{base_url}/{epub_filename}" type="application/epub+zip"/>
+    <link rel="http:{S}{S}opds-spec.org{S}acquisition" href="{base_url}{S}{epub_filename}" type="application/epub+zip"/>
   </entry>
 </feed>"""
 
