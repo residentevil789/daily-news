@@ -151,7 +151,7 @@ for idx, (name, url) in enumerate(FEEDS):
         # 1. Try RSS embedded content/summary first (instant & never blocked)
         raw_feed_html = ""
         if entry.get("content"):
-            raw_feed_html = entry["content"].get("value", "")
+        raw_feed_html = entry["content"][0].get("value", "")
         if not raw_feed_html:
             raw_feed_html = entry.get("summary", entry.get("description", ""))
 
