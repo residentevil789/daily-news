@@ -1,20 +1,20 @@
-Run time (MNL): 2026-11-21 09:26:42
-Philippine Daily Inquirer: HTTP 200, entries=0
-Rappler: HTTP 200, entries=0
-Philstar Headlines: HTTP 200, entries=0
-GMA News: HTTP 200, entries=0
-MindaNews: HTTP 403, entries=0
-Edge Davao: HTTP 200, entries=0
-SunStar Davao: HTTP 200, entries=0
-BusinessWorld: HTTP 200, entries=0
-Inquirer Business: HTTP 200, entries=0
-Philstar Business: HTTP 200, entries=0
-YugaTech: HTTP 200, entries=0
-Unbox PH: HTTP 200, entries=0
-The Verge: HTTP 200, entries=0
-Spin.ph: HTTP 403, entries=0
-Tiebreaker Times: HTTP 200, entries=0
-Pepper.ph: HTTP 200, entries=0
-Inquirer Lifestyle: HTTP 200, entries=0
-BBC World: ERROR HTTPSConnectionPool(host='bbci.co.uk', port=443): Max retries exceeded with url: / (Caused by NewConnectionError("HTTPSConnection(host='bbci.co.uk', port=443): Failed to establish a new connection: [Errno 111] Connection refused"))
-Al Jazeera: HTTP 200, entries=0
+Run time (MNL): 2026-11-21 09:29:55
+Philippine Daily Inquirer: ERROR Failed to parse: 'google.comsite:inquirer.net+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Rappler: ERROR Failed to parse: 'google.comsite:rappler.com+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Philstar Headlines: ERROR Failed to parse: 'google.comsite:philstar.com+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+GMA News: HTTP 404, entries=0
+MindaNews: ERROR Failed to parse: 'google.comsite:mindanews.com+when:2d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Edge Davao: HTTP 200, entries=10
+SunStar Davao: ERROR Failed to parse: 'google.comsite:sunstar.com.ph+davao+when:2d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+BusinessWorld: ERROR Failed to parse: 'google.comsite:bworldonline.com+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Inquirer Business: ERROR Failed to parse: 'google.comsite:business.inquirer.net+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Philstar Business: ERROR Failed to parse: 'google.comsite:philstar.com+business+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+YugaTech: HTTP 200, entries=10
+Unbox PH: HTTP 200, entries=10
+The Verge: HTTP 200, entries=10
+Spin.ph: ERROR Failed to parse: 'google.comsite:spin.ph+when:1d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+Tiebreaker Times: HTTP 200, entries=10
+Pepper.ph: HTTP 404, entries=0
+Inquirer Lifestyle: ERROR Failed to parse: 'google.comsite:lifestyle.inquirer.net+when:2d&hl=en-PH&gl=PH&ceid=PH:en' is not a valid host or port
+BBC World: ERROR HTTPSConnectionPool(host='bbci.co.uk', port=443): Max retries exceeded with url: /news/world/rss.xml (Caused by NewConnectionError("HTTPSConnection(host='bbci.co.uk', port=443): Failed to establish a new connection: [Errno 111] Connection refused"))
+Al Jazeera: HTTP 200, entries=25
