@@ -3,7 +3,7 @@ import requests
 import feedparser
 import trafilatura
 from ebooklib import epub
-from googlenewsdecoder import new_decoderv1
+from googlenewsdecoder import gnewsdecoder as new_decoderv1
 
 GITHUB_USER = "residentevil789"
 REPO_NAME = "daily-news"
