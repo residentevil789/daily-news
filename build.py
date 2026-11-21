@@ -19,15 +19,11 @@ W = "www" + "."
 def direct(host, path):
     return f"https:{S}{S}{host}{S}{path}"
 
-def make_brief(text, title="", max_sentences=4, max_chars=650):
-    clean = " ".join(text.split())
-    if title and clean.lower().startswith(title.lower()):
-        clean = clean[len(title):].lstrip(" -:|—–")
-    sentences = re.split(r'(?<=[.!?])\s+', clean)
-    brief = " ".join(sentences[:max_sentences])
-    if len(brief) > max_chars:
-        brief = brief[:max_chars].rsplit(" ", 1)[0] + "..."
-    return brief
+def format_paragraphs(text, title=""):
+    lines = [p.strip() for p in text.split("\n") if p.strip()]
+    if lines and title and lines[0].lower() == title.lower():
+        lines = lines[1:]
+    return "".join(f"<p>{html.escape(p)}</p>" for p in lines)
 
 def extract_recipe_html(page_html):
     scripts = re.findall(r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', page_html, re.S | re.I)
@@ -59,7 +55,7 @@ def get_pepper_recipes():
         for sl in slugs:
             if sl not in seen and sl != "/recipes":
                 seen.append(sl)
-            if len(seen) >= 2:
+            if len(seen) >= 6:
                 break
         html_out = "<h1>Pepper.ph</h1>"
         for sl in seen:
@@ -70,13 +66,13 @@ def get_pepper_recipes():
             rec_body = extract_recipe_html(r_resp.text)
             if not rec_body:
                 txt = trafilatura.extract(r_resp.text, include_comments=False) or "Recipe details unavailable."
-                rec_body = "".join(f"<p>{html.escape(p)}</p>" for p in txt.split("\n") if p.strip())
+                rec_body = format_paragraphs(txt, r_title)
             html_out += f"<h3>{r_title}</h3>{rec_body}<hr/>"
         return html_out if seen else None
     except Exception:
         return None
 
-SPAM_WORDS = ("casino", "gambling", "betting", "slot", "sabong", "poker", "roulette", "jackpot", "pragmatic play", "jili")
+SPAM_WORDS = ("casino", "gambling", "betting", "slot", "sabong", "poker", "roulette", "jackpot", "bangladeshi")
 
 FEEDS = [
     ("Philippine Daily Inquirer", direct("newsinfo.inquirer.net", "feed")),
@@ -84,7 +80,6 @@ FEEDS = [
     ("Philstar Headlines", direct(W + "philstar.com", "rss/headlines")),
     ("GMA News", direct("://gmanetwork.com", "gno/rss/news/nation/feed.xml")),
     ("MindaNews", direct("mindanews.com", "feed/")),
-    ("Edge Davao", direct("edgedavao.net", "feed/")),
     ("SunStar Davao", direct(W + "sunstar.com.ph", "api/v1/collections/davao.rss")),
     ("BusinessWorld", direct(W + "bworldonline.com", "feed/")),
     ("Inquirer Business", direct("business.inquirer.net", "feed")),
@@ -135,31 +130,29 @@ for idx, (name, url) in enumerate(FEEDS):
         title = html.escape(raw_title)
         link = entry.get("link", "")
 
-        raw_feed_html = ""
-        if entry.get("content"):
-            raw_feed_html = entry["content"][0].get("value", "")
-        if not raw_feed_html:
-            raw_feed_html = entry.get("summary", entry.get("description", ""))
-
-        clean_text = trafilatura.extract(raw_feed_html, include_comments=False) if raw_feed_html else ""
-        if not clean_text and raw_feed_html:
-            clean_text = re.sub(r'<[^>]+>', ' ', raw_feed_html)
-
-        if len(" ".join((clean_text or "").split())) < 120 and link:
+        full_text = None
+        if link:
             try:
-                art_resp = requests.get(link, headers=HEADERS, timeout=10)
+                art_resp = requests.get(link, headers=HEADERS, timeout=12)
                 if art_resp.status_code == 200:
-                    scraped = trafilatura.extract(art_resp.text, include_comments=False)
-                    if scraped and len(scraped) > len(clean_text or ""):
-                        clean_text = scraped
+                    full_text = trafilatura.extract(art_resp.text, include_comments=False)
             except Exception:
                 pass
 
-        brief = make_brief(clean_text or "", raw_title)
-        if len(brief) < 25:
+        if not full_text:
+            raw_feed_html = ""
+            if entry.get("content"):
+                raw_feed_html = entry["content"][0].get("value", "")
+            if not raw_feed_html:
+                raw_feed_html = entry.get("summary", entry.get("description", ""))
+            if raw_feed_html:
+                full_text = trafilatura.extract(raw_feed_html, include_comments=False) or re.sub(r'<[^>]+>', ' ', raw_feed_html)
+
+        if not full_text or len(full_text.strip()) < 30:
             continue
 
-        items_html += f"<h3>{title}</h3><p>{html.escape(brief)}</p><hr/>"
+        body_html = format_paragraphs(full_text, raw_title)
+        items_html += f"<h3>{title}</h3>{body_html}<hr/>"
         added += 1
 
     if added > 0:
